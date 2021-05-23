@@ -1,6 +1,6 @@
 /*
  MarsToken is a deflationary defi token
- For every transaction, 4% goes to holders and 6% goes to the Liquidity Pool
+ For every transaction, 2% goes to holders and 3% goes to the Liquidity Pool
  As the burn address participates as a holder, the supply is forever decreasing
 */
 
@@ -712,8 +712,8 @@ contract MarsToken is Context, IERC20, Ownable {
     uint256 public _liquidityFee = 3;
     uint256 private _previousLiquidityFee = _liquidityFee;
 
-    IUniswapV2Router02 public immutable uniswapV2Router;
-    address public immutable uniswapV2Pair;
+    IUniswapV2Router02 public uniswapV2Router;
+    address public uniswapV2Pair;
     
     bool inSwapAndLiquify;
     bool public swapAndLiquifyEnabled = true;
@@ -888,8 +888,16 @@ contract MarsToken is Context, IERC20, Ownable {
         swapAndLiquifyEnabled = _enabled;
         emit SwapAndLiquifyEnabledUpdated(_enabled);
     }
+
+    function setRouter(address router) public onlyOwner {
+        uniswapV2Router = IUniswapV2Router02(router);
+    }
+
+    function setPairAddress(address pair) public onlyOwner {
+        uniswapV2Pair = pair;
+    }
     
-     //to recieve ETH from uniswapV2Router when swaping
+    //to recieve ETH from uniswapV2Router when swaping
     receive() external payable {}
 
   
