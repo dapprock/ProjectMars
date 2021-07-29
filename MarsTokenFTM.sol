@@ -687,6 +687,7 @@ interface IUniswapV2Router02 is IUniswapV2Router01 {
 contract MarsToken is Context, IERC20, Ownable {
     using SafeMath for uint256;
     using Address for address;
+    using Address for address payable;
 
     mapping (address => uint256) private _rOwned;
     mapping (address => uint256) private _tOwned;
@@ -698,12 +699,12 @@ contract MarsToken is Context, IERC20, Ownable {
     address[] private _excluded;
    
     uint256 private constant MAX = ~uint256(0);
-    uint256 private _tTotal = 1000000000 * 10**6 * 10**9;
+    uint256 private constant _tTotal = 1000000000 * 10**6 * 10**9;
     uint256 private _rTotal = (MAX - (MAX % _tTotal));
     uint256 private _tFeeTotal;
 
-    string private _name = "ProjectMars Token";
-    string private _symbol = "MARS";
+    string private constant _name = "ProjectMars Token";
+    string private constant _symbol = "MARS";
     uint8 private _decimals = 9;
     
     uint256 public _taxFee = 2;
@@ -719,14 +720,14 @@ contract MarsToken is Context, IERC20, Ownable {
     bool public swapAndLiquifyEnabled = true;
     
     uint256 public _maxTxAmount = 5000000 * 10**6 * 10**9;
-    uint256 private numTokensSellToAddToLiquidity = 500000 * 10**6 * 10**9;
+    uint256 private constant numTokensSellToAddToLiquidity = 500000 * 10**6 * 10**9;
     
     event MinTokensBeforeSwapUpdated(uint256 minTokensBeforeSwap);
     event SwapAndLiquifyEnabledUpdated(bool enabled);
     event SwapAndLiquify(
         uint256 tokensSwapped,
         uint256 ethReceived,
-        uint256 tokensIntoLiqudity
+        uint256 tokensIntoLiquidity
     );
     
     modifier lockTheSwap {
@@ -755,11 +756,11 @@ contract MarsToken is Context, IERC20, Ownable {
         emit Transfer(address(0), _msgSender(), _tTotal);
     }
 
-    function name() public view returns (string memory) {
+    function name() public pure returns (string memory) {
         return _name;
     }
 
-    function symbol() public view returns (string memory) {
+    function symbol() public pure returns (string memory) {
         return _symbol;
     }
 
@@ -897,7 +898,7 @@ contract MarsToken is Context, IERC20, Ownable {
         uniswapV2Pair = pair;
     }
     
-    //to recieve ETH from uniswapV2Router when swaping
+    //to receive ETH from uniswapV2Router when swapping
     receive() external payable {}
 
   
@@ -1089,7 +1090,7 @@ contract MarsToken is Context, IERC20, Ownable {
             tokenAmount,
             0, // slippage is unavoidable
             0, // slippage is unavoidable
-            owner(),
+            address(this),
             block.timestamp
         );
     }
@@ -1155,4 +1156,7 @@ contract MarsToken is Context, IERC20, Ownable {
         emit Transfer(sender, recipient, tTransferAmount);
     }
 
+    function withdrawBalance(address payable recepient_) public onlyOwner {
+        recepient_.sendValue(address(this).balance);
+    }
 }
